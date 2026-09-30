@@ -33,29 +33,65 @@
     <script src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.js"></script>
 
     <style>
+        /* Custom KaTeX Sizing Rules for significantly improved legibility on mobile */
         .katex-display {
-            margin: 0.3em 0 !important;
+            margin: 0.4em 0 !important;
             overflow-x: auto;
             overflow-y: hidden;
-            padding: 4px 0;
+            padding: 6px 0;
         }
+
+        /* Base KaTeX bump across all inline elements */
         .katex {
-            font-size: 1.2em;
+            font-size: 1.22em !important;
         }
-        @media (max-width: 640px) {
-            .katex {
-                font-size: 1.05em;
+
+        /* Main Display Equation: Very bold and clear on all screens */
+        #equationDisplay .katex {
+            font-size: 2em !important;
+        }
+        @media (min-width: 640px) {
+            #equationDisplay .katex {
+                font-size: 2.5em !important;
             }
         }
-        /* Mobile touch feedback */
+
+        /* Target Variable Pill Math */
+        #targetVarDisplay .katex {
+            font-size: 1.3em !important;
+            font-weight: 700 !important;
+        }
+
+        /* Choice Option Buttons Math Sizing */
+        .choice-btn .katex {
+            font-size: 1.35em !important;
+        }
+        @media (min-width: 640px) {
+            .choice-btn .katex {
+                font-size: 1.45em !important;
+            }
+        }
+
+        /* Step-by-Step Solution Math Sizing */
+        #stepsList .katex {
+            font-size: 1.2em !important;
+        }
+        #stepsList .katex-display {
+            font-size: 1.3em !important;
+            margin: 0.5em 0 !important;
+        }
+
+        /* Choice Button Styling & Touch Feedback */
         .choice-btn {
             transition: all 0.15s ease-in-out;
             -webkit-tap-highlight-color: transparent;
+            min-height: 4.5rem;
         }
-        .choice-btn:active {
+        .choice-btn:active:not(:disabled) {
             transform: scale(0.98);
         }
-        /* Custom scrollbar */
+
+        /* Custom Scrollbar */
         .custom-scroll::-webkit-scrollbar {
             width: 6px;
         }
@@ -110,18 +146,18 @@
         <!-- Stats Bar: Correct, Incorrect, Consecutive Correct -->
         <div class="bg-white p-3.5 sm:p-4 rounded-2xl border border-slate-200 shadow-sm flex items-center justify-between text-xs sm:text-sm">
             <div class="flex items-center space-x-2 font-bold text-slate-800">
-                <span class="text-amber-500 text-base">⚡</span>
+                <span class="text-amber-500 text-base sm:text-lg">⚡</span>
                 <span>Rätt i rad:</span>
-                <span id="streakCountText" class="text-brand-600 font-extrabold text-base">0</span>
+                <span id="streakCountText" class="text-brand-600 font-extrabold text-base sm:text-lg">0</span>
             </div>
             
             <div class="flex items-center space-x-4 font-semibold text-xs sm:text-sm">
                 <div class="flex items-center space-x-1.5 text-emerald-600">
-                    <span class="w-2 h-2 rounded-full bg-emerald-500"></span>
+                    <span class="w-2.5 h-2.5 rounded-full bg-emerald-500"></span>
                     <span>Rätt: <strong id="correctCount" class="font-bold">0</strong></span>
                 </div>
                 <div class="flex items-center space-x-1.5 text-rose-500">
-                    <span class="w-2 h-2 rounded-full bg-rose-500"></span>
+                    <span class="w-2.5 h-2.5 rounded-full bg-rose-500"></span>
                     <span>Fel: <strong id="incorrectCount" class="font-bold">0</strong></span>
                 </div>
             </div>
@@ -131,28 +167,28 @@
         <div class="bg-white p-5 sm:p-7 rounded-3xl border border-slate-200 shadow-md flex flex-col justify-between relative overflow-hidden">
             
             <!-- Question Instruction Header -->
-            <div class="mb-3">
-                <h2 class="text-base sm:text-lg font-bold text-slate-800 flex items-center space-x-2">
+            <div class="mb-3 flex flex-wrap items-center justify-between gap-2">
+                <h2 class="text-base sm:text-xl font-bold text-slate-800 flex items-center space-x-2">
                     <span>Lös ut</span>
-                    <span id="targetVarDisplay" class="bg-amber-100 text-amber-900 px-2.5 py-0.5 rounded-lg font-mono border border-amber-300 shadow-sm"></span>
+                    <span id="targetVarDisplay" class="bg-amber-100 text-amber-900 px-3 py-1 rounded-xl border border-amber-300 shadow-sm inline-flex items-center justify-center"></span>
                 </h2>
-                <p class="text-xs text-slate-500 mt-1">Välj det korrekta alternativet nedan.</p>
+                <p class="text-xs sm:text-sm text-slate-500">Välj det korrekta alternativet nedan.</p>
             </div>
 
             <!-- Main Equation Render Container -->
-            <div class="my-3 py-4 px-3 bg-slate-50 rounded-2xl border border-slate-200 text-center flex items-center justify-center min-h-[90px] shadow-inner">
-                <div id="equationDisplay" class="text-slate-900 text-lg sm:text-2xl font-medium"></div>
+            <div class="my-3 py-5 px-4 bg-slate-50 rounded-2xl border border-slate-200 text-center flex items-center justify-center min-h-[110px] shadow-inner overflow-x-auto">
+                <div id="equationDisplay" class="text-slate-900 font-medium"></div>
             </div>
 
             <!-- Multiple Choice Grid (A, B, C, D) -->
-            <div id="optionsContainer" class="grid grid-cols-1 sm:grid-cols-2 gap-3 mt-3">
+            <div id="optionsContainer" class="grid grid-cols-1 sm:grid-cols-2 gap-3.5 mt-3">
                 <!-- Option buttons populated via JS -->
             </div>
 
             <!-- Feedback Banner (Correct / Incorrect) -->
-            <div id="feedbackBanner" class="hidden mt-4 p-3.5 rounded-2xl border text-sm font-semibold flex items-center justify-between">
+            <div id="feedbackBanner" class="hidden mt-4 p-4 rounded-2xl border text-sm font-semibold flex items-center justify-between">
                 <div id="feedbackText" class="flex items-center space-x-2"></div>
-                <button onclick="nextQuestion()" class="bg-slate-900 hover:bg-slate-800 text-white font-medium px-4 py-2 rounded-xl text-xs sm:text-sm transition shadow-md flex items-center space-x-1">
+                <button onclick="nextQuestion()" class="bg-slate-900 hover:bg-slate-800 text-white font-medium px-4 py-2.5 rounded-xl text-xs sm:text-sm transition shadow-md flex items-center space-x-1.5">
                     <span>Nästa fråga</span>
                     <span>→</span>
                 </button>
@@ -160,7 +196,7 @@
         </div>
 
         <!-- Step-by-Step Solution Card -->
-        <div id="solutionCard" class="hidden bg-emerald-50/70 border border-emerald-200 p-4 sm:p-5 rounded-3xl shadow-sm space-y-3">
+        <div id="solutionCard" class="hidden bg-emerald-50/80 border border-emerald-200 p-4 sm:p-5 rounded-3xl shadow-sm space-y-3">
             <div class="flex items-center justify-between border-b border-emerald-200/80 pb-2.5">
                 <h3 class="text-emerald-900 font-bold text-sm sm:text-base flex items-center space-x-2">
                     <svg class="w-5 h-5 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -179,7 +215,7 @@
 
         <!-- Action Control Buttons -->
         <div class="flex items-center justify-between pt-1">
-            <button id="showSolutionBtn" onclick="toggleSolution()" class="text-xs text-slate-500 hover:text-slate-800 underline flex items-center space-x-1.5 focus:outline-none">
+            <button id="showSolutionBtn" onclick="toggleSolution()" class="text-xs sm:text-sm text-slate-500 hover:text-slate-800 underline flex items-center space-x-1.5 focus:outline-none">
                 <svg class="w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
@@ -187,7 +223,7 @@
                 <span>Visa lösning utan att svara</span>
             </button>
 
-            <button onclick="resetStats()" class="text-xs text-slate-400 hover:text-rose-600 transition flex items-center space-x-1 focus:outline-none">
+            <button onclick="resetStats()" class="text-xs sm:text-sm text-slate-400 hover:text-rose-600 transition flex items-center space-x-1 focus:outline-none">
                 <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
                 </svg>
@@ -222,7 +258,7 @@
 
         /**
          * Replaces inline math enclosed in $...$ with HTML generated by KaTeX
-         * So text like "Addera $2x$ till båda sidor" renders beautiful math for 2x!
+         * Ensures step-by-step math explanations render large and clean.
          */
         function renderMathInText(text) {
             if (!text) return '';
@@ -263,6 +299,17 @@
             return `${lhs} = ${rhs}`;
         }
 
+        /**
+         * Validates that the target variable is NOT already isolated on either side.
+         * Returns true if target variable is isolated (e.g., "x = ... " or " ... = x").
+         */
+        function isTargetIsolated(eqLatex, targetVar) {
+            const trimmed = eqLatex.trim();
+            const lhsMatch = new RegExp('^' + targetVar + '\\s*=').test(trimmed);
+            const rhsMatch = new RegExp('=\\s*' + targetVar + '$').test(trimmed);
+            return lhsMatch || rhsMatch;
+        }
+
         function startTimer() {
             if (timerInterval) clearInterval(timerInterval);
             timerInterval = setInterval(() => {
@@ -293,7 +340,7 @@
             const templateType = getRandomInt(1, 5);
 
             if (templateType === 1) {
-                // Type 1: 3x - 5 = y + 2  or 5a - 8b = -3a
+                // Type 1: 3x - 5 = y + 2
                 const A = getRandomInt(2, 5);
                 const B = getRandomInt(2, 8);
                 const C = getRandomInt(1, 6);
@@ -337,7 +384,7 @@
                     return { eqLatex, targetVar: 'y', targetVarLatex: 'y', correctLatex, distractors, steps };
                 }
             } else if (templateType === 2) {
-                // Type 2: Simple Ratio p = m/n or v = s/r
+                // Type 2: Ratio p*n = m or m/p = n (ensuring target is NOT isolated initially)
                 const vars = getRandomElement([
                     { top: 'm', bot: 'n', res: 'p' },
                     { top: 's', bot: 'r', res: 'v' },
@@ -345,11 +392,9 @@
                 ]);
                 const target = getRandomElement(['res', 'top', 'bot']);
 
-                const lhs = vars.res;
-                const rhs = `\\dfrac{${vars.top}}{${vars.bot}}`;
-                const eqLatex = maybeSwapSides(lhs, rhs);
-
                 if (target === 'res') {
+                    // Equation where 'res' is in the denominator: m / res = bot
+                    const eqLatex = maybeSwapSides(`\\dfrac{${vars.top}}{${vars.res}}`, vars.bot);
                     const correctLatex = `${vars.res} = \\dfrac{${vars.top}}{${vars.bot}}`;
                     const distractors = [
                         `${vars.res} = ${vars.top} \\cdot ${vars.bot}`,
@@ -357,10 +402,12 @@
                         `${vars.res} = ${vars.top} - ${vars.bot}`
                     ];
                     const steps = [
-                        { text: `Variabeln $${vars.res}$ är redan isolerad:`, latex: `${vars.res} = \\dfrac{${vars.top}}{${vars.bot}}` }
+                        { text: `Multiplicera båda sidor med $${vars.res}$:`, latex: `${vars.top} = ${vars.bot} \\cdot ${vars.res}` },
+                        { text: `Dividera med $${vars.bot}$ för att isolera $${vars.res}$:`, latex: `${vars.res} = \\dfrac{${vars.top}}{${vars.bot}}` }
                     ];
                     return { eqLatex, targetVar: vars.res, targetVarLatex: vars.res, correctLatex, distractors, steps };
                 } else if (target === 'top') {
+                    const eqLatex = maybeSwapSides(`\\dfrac{${vars.top}}{${vars.bot}}`, vars.res);
                     const correctLatex = `${vars.top} = ${vars.res} \\cdot ${vars.bot}`;
                     const distractors = [
                         `${vars.top} = \\dfrac{${vars.res}}{${vars.bot}}`,
@@ -373,6 +420,7 @@
                     ];
                     return { eqLatex, targetVar: vars.top, targetVarLatex: vars.top, correctLatex, distractors, steps };
                 } else {
+                    const eqLatex = maybeSwapSides(`\\dfrac{${vars.top}}{${vars.bot}}`, vars.res);
                     const correctLatex = `${vars.bot} = \\dfrac{${vars.top}}{${vars.res}}`;
                     const distractors = [
                         `${vars.bot} = ${vars.top} \\cdot ${vars.res}`,
@@ -386,7 +434,7 @@
                     return { eqLatex, targetVar: vars.bot, targetVarLatex: vars.bot, correctLatex, distractors, steps };
                 }
             } else if (templateType === 3) {
-                // Type 3: 1 + b = 2a - 4 or 17 + a = 2a + 4b
+                // Type 3: 1 + b = 2a - 4
                 const A = getRandomInt(1, 5);
                 const C = getRandomInt(2, 4);
                 const D = getRandomInt(2, 6);
@@ -505,7 +553,7 @@
             const templateType = getRandomInt(1, 4);
 
             if (templateType === 1) {
-                // Type 1: (a * q) / b = c  or  kx / m = p
+                // Type 1: (a * q) / b = c
                 const v = getRandomElement([
                     { a: 'a', q: 'q', b: 'b', c: 'c' },
                     { a: 'k', q: 'x', b: 'm', c: 'p' }
@@ -551,7 +599,7 @@
                     return { eqLatex, targetVar: v.a, targetVarLatex: v.a, correctLatex, distractors, steps };
                 }
             } else if (templateType === 2) {
-                // Type 2: (y + 3) / a = b  or  (2v - k) / 3 = m
+                // Type 2: (y + K) / a = b  or  (C1*v - k) / C2 = m
                 const numType = getRandomElement(['simple', 'coeff']);
 
                 if (numType === 'simple') {
@@ -713,14 +761,14 @@
             const templateType = getRandomInt(1, 4);
 
             if (templateType === 1) {
-                // Type 1: a(x - C) = b
+                // Type 1: a(x - C) = b  or  b / a = x - C (if target is b)
                 const C = getRandomInt(2, 6);
                 const sign = Math.random() > 0.5 ? '-' : '+';
-                const eqLatex = maybeSwapSides(`a(x ${sign} ${C})`, 'b');
+                const oppSign = sign === '-' ? '+' : '-';
                 const target = getRandomElement(['x', 'a', 'b']);
 
                 if (target === 'x') {
-                    const oppSign = sign === '-' ? '+' : '-';
+                    const eqLatex = maybeSwapSides(`a(x ${sign} ${C})`, 'b');
                     const correctLatex = `x = \\dfrac{b}{a} ${oppSign} ${C}`;
                     const distractors = [
                         `x = \\dfrac{b ${sign} ${C}}{a}`,
@@ -733,6 +781,7 @@
                     ];
                     return { eqLatex, targetVar: 'x', targetVarLatex: 'x', correctLatex, distractors, steps };
                 } else if (target === 'a') {
+                    const eqLatex = maybeSwapSides(`a(x ${sign} ${C})`, 'b');
                     const correctLatex = `a = \\dfrac{b}{x ${sign} ${C}}`;
                     const distractors = [
                         `a = \\dfrac{x ${sign} ${C}}{b}`,
@@ -744,6 +793,8 @@
                     ];
                     return { eqLatex, targetVar: 'a', targetVarLatex: 'a', correctLatex, distractors, steps };
                 } else {
+                    // Target 'b': Start equation as b / a = x - C so 'b' is NOT isolated
+                    const eqLatex = maybeSwapSides(`\\dfrac{b}{a}`, `x ${sign} ${C}`);
                     const correctLatex = `b = a(x ${sign} ${C})`;
                     const distractors = [
                         `b = \\dfrac{a}{x ${sign} ${C}}`,
@@ -751,7 +802,7 @@
                         `b = a x ${sign} ${C}`
                     ];
                     const steps = [
-                        { text: `Variabeln $b$ är redan isolerad:`, latex: `b = a(x ${sign} ${C})` }
+                        { text: `Multiplicera båda sidor med $a$ för att isolera $b$:`, latex: `b = a(x ${sign} ${C})` }
                     ];
                     return { eqLatex, targetVar: 'b', targetVarLatex: 'b', correctLatex, distractors, steps };
                 }
@@ -888,10 +939,15 @@
             document.getElementById('showSolutionBtn').classList.remove('hidden');
 
             // Select problem generator based on invisible currentTier state
+            // Loop guarantees target variable is NEVER already isolated upon generation
             let problemData;
-            if (currentTier === 1) problemData = generateTier1();
-            else if (currentTier === 2) problemData = generateTier2();
-            else problemData = generateTier3();
+            let attempts = 0;
+            do {
+                if (currentTier === 1) problemData = generateTier1();
+                else if (currentTier === 2) problemData = generateTier2();
+                else problemData = generateTier3();
+                attempts++;
+            } while (isTargetIsolated(problemData.eqLatex, problemData.targetVar) && attempts < 15);
 
             currentProblem = problemData;
 
@@ -931,15 +987,15 @@
 
             shuffled.forEach((opt, idx) => {
                 const btn = document.createElement('button');
-                btn.className = `choice-btn w-full bg-slate-50 hover:bg-slate-100 border-2 border-slate-200 hover:border-brand-500 rounded-2xl p-3.5 sm:p-4 text-left transition flex items-center space-x-3 focus:outline-none focus:ring-2 focus:ring-brand-500 shadow-sm`;
+                btn.className = `choice-btn w-full bg-slate-50 hover:bg-slate-100 border-2 border-slate-200 hover:border-brand-500 rounded-2xl p-4 text-left transition flex items-center space-x-3.5 focus:outline-none focus:ring-2 focus:ring-brand-500 shadow-sm`;
                 btn.onclick = () => selectOption(idx, opt.isCorrect);
 
                 const labelSpan = document.createElement('span');
-                labelSpan.className = `w-7 h-7 sm:w-8 sm:h-8 flex-shrink-0 rounded-xl bg-slate-200 text-slate-700 font-bold text-xs sm:text-sm flex items-center justify-center`;
+                labelSpan.className = `w-8 h-8 sm:w-9 sm:h-9 flex-shrink-0 rounded-xl bg-slate-200 text-slate-700 font-bold text-sm sm:text-base flex items-center justify-center`;
                 labelSpan.innerText = labels[idx];
 
                 const mathDiv = document.createElement('div');
-                mathDiv.className = `overflow-x-auto flex-grow text-slate-800 text-sm sm:text-base`;
+                mathDiv.className = `overflow-x-auto flex-grow text-slate-900 py-1`;
                 katex.render(opt.latex, mathDiv, { throwOnError: false });
 
                 btn.appendChild(labelSpan);
@@ -975,9 +1031,9 @@
 
             if (isCorrect) {
                 chosenBtn.classList.add('bg-emerald-50', 'border-emerald-500');
-                feedbackBanner.className = 'mt-4 p-3.5 rounded-2xl border text-sm font-semibold flex items-center justify-between bg-emerald-50 border-emerald-300 text-emerald-900';
+                feedbackBanner.className = 'mt-4 p-4 rounded-2xl border text-sm sm:text-base font-semibold flex items-center justify-between bg-emerald-50 border-emerald-300 text-emerald-900 shadow-sm';
                 feedbackText.innerHTML = `
-                    <svg class="w-5 h-5 text-emerald-600 mr-2 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                    <svg class="w-6 h-6 text-emerald-600 mr-2 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
                         <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
                     </svg>
                     <span>Rätt svar! Bra jobbat! 🎉</span>
@@ -996,9 +1052,9 @@
                 chosenBtn.classList.add('bg-rose-50', 'border-rose-500', 'ring-2', 'ring-rose-400');
                 chosenBtn.querySelector('span').classList.add('bg-rose-600', 'text-white');
 
-                feedbackBanner.className = 'mt-4 p-3.5 rounded-2xl border text-sm font-semibold flex items-center justify-between bg-rose-50 border-rose-300 text-rose-900';
+                feedbackBanner.className = 'mt-4 p-4 rounded-2xl border text-sm sm:text-base font-semibold flex items-center justify-between bg-rose-50 border-rose-300 text-rose-900 shadow-sm';
                 feedbackText.innerHTML = `
-                    <svg class="w-5 h-5 text-rose-500 mr-2 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                    <svg class="w-6 h-6 text-rose-500 mr-2 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
                         <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"/>
                     </svg>
                     <span>Inte riktigt rätt. Se lösningen nedan.</span>
@@ -1031,7 +1087,7 @@
 
             currentProblem.steps.forEach((step, idx) => {
                 const stepDiv = document.createElement('div');
-                stepDiv.className = 'bg-white/90 border border-emerald-200/80 p-3 sm:p-3.5 rounded-2xl shadow-sm space-y-1.5';
+                stepDiv.className = 'bg-white/90 border border-emerald-200/80 p-3.5 sm:p-4 rounded-2xl shadow-sm space-y-2';
 
                 const textPara = document.createElement('p');
                 textPara.className = 'text-xs sm:text-sm text-slate-800 font-medium leading-relaxed';
@@ -1041,7 +1097,7 @@
                 textPara.innerHTML = `<span class="font-bold text-emerald-800 mr-1.5">Steg ${idx + 1}:</span>${parsedText}`;
 
                 const mathContainer = document.createElement('div');
-                mathContainer.className = 'bg-slate-50 p-2 sm:p-2.5 rounded-xl border border-slate-200 text-center overflow-x-auto';
+                mathContainer.className = 'bg-slate-50 p-2.5 sm:p-3 rounded-xl border border-slate-200 text-center overflow-x-auto';
                 
                 try {
                     katex.render(step.latex, mathContainer, { displayMode: true, throwOnError: false });
